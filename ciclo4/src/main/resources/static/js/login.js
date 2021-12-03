@@ -1,7 +1,7 @@
 /**
  * URL de acceso a recurso
  */
-const BASE_URL = "/api/user";
+const BASE_URL = "http://129.151.105.35:8080/api/user";
 
 /**
  * Se utiliza para que añada el evento despues
