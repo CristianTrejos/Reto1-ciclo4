@@ -1,3 +1,7 @@
+/**
+ * URL de acceso a recurso
+ */
+const BASE_URL = "http://129.151.105.35:8080/api/user";
 
 /**
  * Se utiliza para que añada el evento despues
@@ -8,15 +12,10 @@
 window.onload = function () {
 
   document.getElementById("formulario").addEventListener("submit", ingreso);
-  //document.getElementById("botonIngresar").addEventListener("click", ingreso);
+  document.getElementById("enviarDatos").addEventListener("click", guardarCambios);
   document.getElementById("botonRegistrar").addEventListener("click", registro);
 
 }
-
-/**
- * URL de acceso a recurso
- */
-const BASE_URL = "/api/user";
 
 /**
  * funcion que se ejecuta al detectar el evento click en el boton
@@ -73,7 +72,7 @@ function respuestaIngreso(json) {
     mostrarMensaje("La informacion de inicio de sesion es CORRECTA", "Inicio Sesion");
     setTimeout(() => {
       window.location.href = "home.html?email=" + json.email + "&pswd=" + json.password + "&name=" + json.name;
-    }, 3000);
+    }, 2000);
 
   }
   else {
@@ -131,10 +130,11 @@ var cerrarModalMensaje = function () {
 
 function mostrarRegistro() {
   $('#modalRegistro').modal('show');
-
 }
 
-async function guardarCambios() {
+async function guardarCambios(event) {
+  event.preventDefault();
+  var emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
   let $email = document.getElementById("emailModal").value;
   let $password = document.getElementById("passwordModal").value;
   let $name = document.getElementById("nameModal").value;
@@ -144,11 +144,13 @@ async function guardarCambios() {
   }
   else if ($password != $confirm) {
     mostrarMensaje("Las contraseñas no coinciden", "ADVERTENCIA");
+  } 
+    else if (!emailPattern.test($email)) {
+    mostrarMensaje("Ingrese un correo adecuado.", "ADVERTENCIA");
   } else {
-    await verificarCorreo($email)
+    await verificarCorreo($email);
   }
 }
-
 async function verificarCorreo(email) {
   try {
     const url = BASE_URL + '/' + email;
@@ -188,17 +190,25 @@ async function guardarRegistro() {
     const responseConverted = await response.json();
     console.log(`esta es la respuesta`, responseConverted);
     mostrarMensaje("Usuario Registrado Exitosamente","MENSAJE");
+    cerrarModal();
+    borrarCampos();
   } catch (error) {
     console.log(`error`, error);
   }
 }
 
 function capturarDatosUsuario() {
-
   let datosCapturados = {
     name: document.getElementById("nameModal").value.trim(),
     email: document.getElementById("emailModal").value.trim(),
     password: document.getElementById("passwordModal").value.trim(),
   };
   return JSON.stringify(datosCapturados);
+}
+
+function borrarCampos() {
+  document.getElementById("emailModal").value = "";
+  document.getElementById("passwordModal").value = "";
+  document.getElementById("nameModal").value = "";
+  document.getElementById("confirmModal").value = "";
 }
